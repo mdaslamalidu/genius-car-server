@@ -120,7 +120,7 @@ async function run() {
         product_profile: "general",
         cus_name: query.customer,
         cus_email: query.email,
-        cus_add1: "Dhaka",
+        cus_add1: query.address,
         cus_add2: "Dhaka",
         cus_city: "Dhaka",
         cus_state: "Dhaka",
@@ -137,8 +137,16 @@ async function run() {
         ship_country: "Bangladesh",
       };
 
-      const result = await orderCollection.insertOne(query);
-      res.send(result);
+      const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
+      sslcz.init(data).then((apiResponse) => {
+        // Redirect the user to payment gateway
+        let GatewayPageURL = apiResponse.GatewayPageURL;
+        res.send({ url: GatewayPageURL });
+        console.log("Redirecting to: ", GatewayPageURL);
+      });
+
+      // const result = await orderCollection.insertOne(query);
+      // res.send(result);
     });
 
     app.patch("/orders/:id", verifyJwt, async (req, res) => {
