@@ -102,6 +102,10 @@ async function run() {
 
     app.post("/orders", verifyJwt, async (req, res) => {
       const query = req.body;
+      const orderedService = await servicesCollection.findOne({
+        _id: ObjectId(query.service),
+      });
+
       const result = await orderCollection.insertOne(query);
       res.send(result);
     });
