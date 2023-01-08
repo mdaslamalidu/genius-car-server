@@ -1,10 +1,14 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const SSLCommerzPayment = require("sslcommerz-lts");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 5000;
 require("dotenv").config();
+const store_id = process.env.STORE_ID;
+const store_passwd = process.env.STORE_PASSWORD;
+const is_live = false; //true for live, false for sandbox
 
 // midile war
 app.use(cors(""));
@@ -52,8 +56,23 @@ async function run() {
     });
 
     app.get("/services", async (req, res) => {
-      const query = {};
-      const cursor = servicesCollection.find(query);
+      const search = req.query.search;
+      let query = {};
+      if (req.query.less) {
+        req.query.less === "less"
+          ? (query = { price: { $lt: 100 } })
+          : (query = { price: { $gt: 100 } });
+      }
+
+      if (search.length) {
+        query = {
+          $text: {
+            $search: search,
+          },
+        };
+      }
+      const order = req.query.order === "asc" ? 1 : -1;
+      const cursor = servicesCollection.find(query).sort({ price: order });
       const result = await cursor.toArray();
       res.send(result);
     });
