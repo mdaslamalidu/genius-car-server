@@ -156,6 +156,10 @@ async function run() {
       // res.send(result);
     });
 
+    app.post("/payment/success", async (req, res) => {
+      console.log("Success");
+    });
+
     app.patch("/orders/:id", verifyJwt, async (req, res) => {
       const id = req.params.id;
       const status = req.body.status;
