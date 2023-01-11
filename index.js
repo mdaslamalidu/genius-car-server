@@ -158,7 +158,20 @@ async function run() {
 
     app.post("/payment/success", async (req, res) => {
       const { transactionId } = req.query;
-      console.log(transactionId);
+      const result = await orderCollection.updateOne(
+        { transactionId },
+        {
+          $set: {
+            paid: true,
+            paidAt: new Date(),
+          },
+        }
+      );
+      if (result.modifiedCount > 0) {
+        res.redirect(
+          `http://localhost:3000/payment/success?transactionId=${transactionId}`
+        );
+      }
     });
 
     app.patch("/orders/:id", verifyJwt, async (req, res) => {
