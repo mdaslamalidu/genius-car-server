@@ -174,6 +174,12 @@ async function run() {
       }
     });
 
+    app.get("/order/by_paymentId/:id", async (req, res) => {
+      const { id } = req.query;
+      const result = await orderCollection.findOne({ transactionId: id });
+      res.send(result);
+    });
+
     app.patch("/orders/:id", verifyJwt, async (req, res) => {
       const id = req.params.id;
       const status = req.body.status;
