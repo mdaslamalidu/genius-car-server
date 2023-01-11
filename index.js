@@ -106,10 +106,12 @@ async function run() {
         _id: ObjectId(query.service),
       });
 
+      const transactionId = new ObjectId().toString();
+
       const data = {
         total_amount: orderedService.price,
         currency: query.currency,
-        tran_id: new ObjectId().toString(), // use unique tran_id for each api call
+        tran_id: transactionId, // use unique tran_id for each api call
         success_url: "http://localhost:3030/success",
         fail_url: "http://localhost:3030/fail",
         cancel_url: "http://localhost:3030/cancel",
@@ -142,7 +144,12 @@ async function run() {
         // Redirect the user to payment gateway
         let GatewayPageURL = apiResponse.GatewayPageURL;
         res.send({ url: GatewayPageURL });
-        console.log("Redirecting to: ", GatewayPageURL);
+        orderCollection.insertOne({
+          ...query,
+          price: orderedService.price,
+          transactionId,
+          paid: false,
+        });
       });
 
       // const result = await orderCollection.insertOne(query);
