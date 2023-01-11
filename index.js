@@ -112,7 +112,7 @@ async function run() {
         total_amount: orderedService.price,
         currency: query.currency,
         tran_id: transactionId, // use unique tran_id for each api call
-        success_url: "http://localhost:5000/payment/success",
+        success_url: `http://localhost:5000/payment/success?transactionId=${transactionId}`,
         fail_url: "http://localhost:5000/payment/fail",
         cancel_url: "http://localhost:5000/payment/cancel",
         ipn_url: "http://localhost:3030/ipn",
@@ -157,7 +157,8 @@ async function run() {
     });
 
     app.post("/payment/success", async (req, res) => {
-      console.log("Success");
+      const { transactionId } = req.query;
+      console.log(transactionId);
     });
 
     app.patch("/orders/:id", verifyJwt, async (req, res) => {
