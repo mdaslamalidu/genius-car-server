@@ -174,8 +174,16 @@ async function run() {
       }
     });
 
+    app.post("/payment/fail", async (req, res) => {
+      const { transactionId } = req.query;
+      const result = await orderCollection.deleteOne({ transactionId });
+      if (result.deletedCount) {
+        res.redirect("http://localhost:3000/payment/fail");
+      }
+    });
+
     app.get("/order/by_paymentId/:id", async (req, res) => {
-      const { id } = req.query;
+      const { id } = req.params;
       const result = await orderCollection.findOne({ transactionId: id });
       res.send(result);
     });
